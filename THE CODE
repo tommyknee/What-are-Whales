@@ -1,1 +1,11 @@
 WE SHOULD TYPE CODE HERE
+pd$gender_fact <- ifelse(pd$gender=="M",1,0)
+pd$race <- as.factor(pd$race)
+levels(pd$race)
+table(pd$state)
+table(pd$state,pd$race)
+quantile(pd$age,na.rm=T)
+pd$signs_of_mental_illness <- ifelse(pd$signs_of_mental_illness=="True",1,0)
+pd$threat_level <- as.factor(pd$threat_level)
+levels(pd$threat_level)
+pd$body_camera <- ifelse(pd$body_camera=="True",1,0)
