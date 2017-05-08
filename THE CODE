@@ -1,4 +1,3 @@
-WE SHOULD TYPE CODE HERE
 pd <- fatal_police_shootings_data
 
 pd$gender_fact <- ifelse(pd$gender=="M",1,0)
