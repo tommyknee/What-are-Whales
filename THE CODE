@@ -1,11 +1,58 @@
 WE SHOULD TYPE CODE HERE
+pd <- fatal_police_shootings_data
+
 pd$gender_fact <- ifelse(pd$gender=="M",1,0)
+
 pd$race <- as.factor(pd$race)
 levels(pd$race)
-table(pd$state)
-table(pd$state,pd$race)
-quantile(pd$age,na.rm=T)
+
 pd$signs_of_mental_illness <- ifelse(pd$signs_of_mental_illness=="True",1,0)
+
 pd$threat_level <- as.factor(pd$threat_level)
 levels(pd$threat_level)
+
 pd$body_camera <- ifelse(pd$body_camera=="True",1,0)
+
+#forming year and month columns
+pd$year <- 0
+pd$year[1:991] <- 2015
+pd$year[992:1954] <- 2016
+pd$year[1955:2293] <- 2017
+
+pd$month <- 0 
+pd$month[1:76] <- 1
+pd$month[77:153] <- 2
+pd$month[154:245] <- 3
+pd$month[246:329] <- 4
+pd$month[330:400] <- 5
+pd$month[401:465] <- 6
+pd$month[466:569]<-7
+pd$month[570:663]<-8
+pd$month[664:745]<-9
+pd$month[746:826]<-10
+pd$month[827:902]<-11
+pd$month[903:991]<-12
+pd$month[992:1072]<-1
+pd$month[1073:1158]<-2
+pd$month[1159:1250]<-3
+pd$month[1251:1323]<-4
+pd$month[1324:1397]<-5
+pd$month[1398:1489]<-6
+pd$month[1490:1561]<-7
+pd$month[1562:1643]<-8
+pd$month[1644:1721]<-9
+pd$month[1722:1798]<-10
+pd$month[1799:1876]<-11
+pd$month[1877:1954]<-12
+
+quantile(pd$age,na.rm=T)
+table(pd$state)
+table(pd$year)
+table(pd$month)
+table(pd$month,pd$year)
+table(pd$state,pd$race)
+table(pd$race,pd$age)
+table(pd$armed,pd$race)
+table(pd$manner_of_death,pd$race)
+table(pd$body_camera,pd$threat_level)
+table(pd$body_camera,pd$race)
