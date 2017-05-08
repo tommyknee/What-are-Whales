@@ -55,3 +55,5 @@ table(pd$armed,pd$race)
 table(pd$manner_of_death,pd$race)
 table(pd$body_camera,pd$threat_level)
 table(pd$body_camera,pd$race)
+
+aggregate(pd,by=list(pd$race),FUN=mean,na.rm=T) #gives average age for each race and proportions of gender/body cam incidents
