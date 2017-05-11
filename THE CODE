@@ -57,3 +57,32 @@ table(pd$body_camera,pd$threat_level)
 table(pd$body_camera,pd$race)
 
 aggregate(pd,by=list(pd$race),FUN=mean,na.rm=T) #gives average age for each race and proportions of gender/body cam incidents
+
+
+
+#############
+# This code will plot time on the x axis by month (from Jan 2015 to Dec 2016)
+
+library(ggplot2)
+library(scales)
+
+pd$date <- as.Date(pd$date)
+pd$body_camera <- ifelse(pd$body_camera=="True",1,0)
+
+# create variables of the month of each observation:
+pd$bymonth <- as.Date(cut(pd$date,
+                         breaks = "month"))
+pd$count <- 1
+# Bar graph by month:
+ggplot(data = pd[pd$year!=2017,],
+       aes(bymonth, count)) +
+  stat_summary(fun.y = sum, # adds up all observations for the month
+               geom = "bar")+
+  stat_summary(aes(bymonth, body_camera),fun.y = sum,
+               geom = "bar",color=2)
+
+# Scatterplot by month
+ggplot(data = pd[pd$year!=2017,],
+       aes(bymonth, body_camera)) +
+  stat_summary(fun.y = sum, # adds up all observations for the month
+               geom = "point")
