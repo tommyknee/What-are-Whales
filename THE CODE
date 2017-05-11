@@ -60,8 +60,9 @@ aggregate(pd,by=list(pd$race),FUN=mean,na.rm=T) #gives average age for each race
 
 
 
-#############
+#######################################
 # This code will plot time on the x axis by month (from Jan 2015 to Dec 2016)
+#######################################
 
 library(ggplot2)
 library(scales)
@@ -86,3 +87,28 @@ ggplot(data = pd[pd$year!=2017,],
        aes(bymonth, body_camera)) +
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "point")
+
+
+
+######################################
+# Split up by age group
+######################################
+
+pd$ageGroup <- NA
+pd$ageGroup[pd$age<18] <- "<18"
+pd$ageGroup[pd$age>=18&pd$age<25] <- "18-24"
+pd$ageGroup[pd$age>=25&pd$age<35] <- "25-34"
+pd$ageGroup[pd$age>=35&pd$age<45] <- "35-44"
+pd$ageGroup[pd$age>=45&pd$age<55] <- "45-54"
+pd$ageGroup[pd$age>=55&pd$age<=65] <- "55-65"
+pd$ageGroup[pd$age>65] <- "65+"
+
+table(pd$ageGroup)
+pd$threat_level<-ifelse(pd$threat_level=="attack",1,0)
+# Bar graph by month:
+ggplot(data = pd[pd$year!=2017,],
+       aes(ageGroup, count)) +
+  stat_summary(fun.y = sum, # adds up all observations for the month
+               geom = "bar")+
+  stat_summary(aes(ageGroup,threat_level),fun.y = sum,
+               geom = "bar",color=2)
