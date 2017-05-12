@@ -47,18 +47,18 @@ for (i in 1:length(pd$date)){
 
 # Explore data
 quantile(pd$age,na.rm=T)
-table(pd$state)
 table(pd$year)
-table(pd$month)
-table(pd$month,pd$year)
-table(pd$state,pd$race)
-table(pd$race,pd$age)
-table(pd$armed,pd$race)
-table(pd$manner_of_death,pd$race)
-table(pd$body_camera,pd$threat_level)
-table(pd$body_camera,pd$race)
+prop.table(table(pd$race))
+prop.table(table(pd$state,pd$race),1)
+prop.table(table(pd$race,pd$ageGroup),2)
+prop.table(table(pd$unarmed,pd$race),2)
+prop.table(table(pd$body_camera,pd$race),2)
+prop.table(table(pd$race,pd$attack),1)
+prop.table(table(pd$signs_of_mental_illness,pd$race),2)
 
-aggregate(pd,by=list(pd$race),FUN=mean,na.rm=T) #gives average age for each race and proportions of gender/body cam incidents
+df <- aggregate(pd,by=list(pd$race),FUN=mean,na.rm=T)
+df<-df[,c(1,7,12,15,16,17,21)]
+df
 
 
 ##########################################
