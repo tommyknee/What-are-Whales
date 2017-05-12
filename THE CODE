@@ -12,6 +12,8 @@ levels(pd$threat_level)
 
 pd$body_camera <- ifelse(pd$body_camera=="True",1,0)
 
+pd$unarmed <- ifelse(pd$armed=="unarmed",1,0)
+
 #forming year and month columns
 pd$year <- 0
 pd$year[1:991] <- 2015
