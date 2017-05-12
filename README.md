@@ -5,3 +5,4 @@
 # Split up by age group
 # Body cam true/false over time
 # Compare across states
+# Race + age? 
