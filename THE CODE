@@ -115,8 +115,8 @@ ggplot(data = pd[pd$year!=2017,],
                
 # Bar graph of race and threat level:
 ggplot(data = pd[pd$year!=2017,],
-+        aes(race, count)) +
-+     stat_summary(fun.y = sum, # adds up all observations for the month
-+                  geom = "bar")+
-+     stat_summary(aes(race,threat_level2),fun.y = sum,
-+                  geom = "bar",color=2)
+       aes(race, count)) +
+     stat_summary(fun.y = sum, # adds up all observations for the month
+                  geom = "bar")+
+     stat_summary(aes(race,threat_level2),fun.y = sum,
+                  geom = "bar",color=2)
