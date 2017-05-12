@@ -1,51 +1,51 @@
-pd <- fatal_police_shootings_data
+library(zoo)
+library(RCurl)
+library(dplyr)
+library(mapproj)
+library(ggplot2)
 
+rawWeb <- getURL("https://raw.githubusercontent.com/washingtonpost/data-police-shootings/master/fatal-police-shootings-data.csv")
+csv <- read.csv(text = rawWeb)
+pd <- csv[1:1954,] # Removing data from 2017 because it is incomplete. We will analyze data from Jan 2015 to Dec 2016.
+
+##########################################
+# Prepare data frame
+##########################################
+
+# Replace "male" with 1 and "female" with 0
 pd$gender_fact <- ifelse(pd$gender=="M",1,0)
 
+# Replace "true" (yes--signs of mental illness) with 1 and "false" (no mental illness) with 0
+pd$signs_of_mental_illness <- ifelse(pd$signs_of_mental_illness=="True",1,0)
+
+# Replace "unarmed" with 1 and otherwise 0
+pd$unarmed <- ifelse(pd$armed=="unarmed",1,0)
+
+# Change date column into R date format
+pd$date <- as.Date(pd$date)
+
+# Factor variable "race"
 pd$race <- as.factor(pd$race)
 levels(pd$race)
 
-pd$signs_of_mental_illness <- ifelse(pd$signs_of_mental_illness=="True",1,0)
-
+# Factor the variable "threat_level"
 pd$threat_level <- as.factor(pd$threat_level)
 levels(pd$threat_level)
 
 pd$body_camera <- ifelse(pd$body_camera=="True",1,0)
 
-pd$unarmed <- ifelse(pd$armed=="unarmed",1,0)
+# Create year and month columns
+pd$year <- NA
+pd$month <- NA
 
-#forming year and month columns
-pd$year <- 0
-pd$year[1:991] <- 2015
-pd$year[992:1954] <- 2016
-pd$year[1955:2293] <- 2017
+for (i in 1:length(pd$date)){
+  date=as.character(pd$date[i])
+  splitDate=unlist(strsplit(date,"-"))
+  pd$year[i]=splitDate[1]
+  pd$month[i]=splitDate[2]
+}
 
-pd$month <- 0 
-pd$month[1:76] <- 1
-pd$month[77:153] <- 2
-pd$month[154:245] <- 3
-pd$month[246:329] <- 4
-pd$month[330:400] <- 5
-pd$month[401:465] <- 6
-pd$month[466:569]<-7
-pd$month[570:663]<-8
-pd$month[664:745]<-9
-pd$month[746:826]<-10
-pd$month[827:902]<-11
-pd$month[903:991]<-12
-pd$month[992:1072]<-1
-pd$month[1073:1158]<-2
-pd$month[1159:1250]<-3
-pd$month[1251:1323]<-4
-pd$month[1324:1397]<-5
-pd$month[1398:1489]<-6
-pd$month[1490:1561]<-7
-pd$month[1562:1643]<-8
-pd$month[1644:1721]<-9
-pd$month[1722:1798]<-10
-pd$month[1799:1876]<-11
-pd$month[1877:1954]<-12
-
+# Explore data
 quantile(pd$age,na.rm=T)
 table(pd$state)
 table(pd$year)
@@ -61,23 +61,16 @@ table(pd$body_camera,pd$race)
 aggregate(pd,by=list(pd$race),FUN=mean,na.rm=T) #gives average age for each race and proportions of gender/body cam incidents
 
 
+##########################################
+# Time series plots (Jan 2015-Dec 2016)
+##########################################
 
-#######################################
-# This code will plot time on the x axis by month (from Jan 2015 to Dec 2016)
-#######################################
-
-library(ggplot2)
-library(scales)
-
-pd$date <- as.Date(pd$date)
-pd$body_camera <- ifelse(pd$body_camera=="True",1,0)
-
-# create variables of the month of each observation:
+# Create variables of the month of each observation:
 pd$bymonth <- as.Date(cut(pd$date,
                          breaks = "month"))
 pd$count <- 1
 # Bar graph by month:
-ggplot(data = pd[pd$year!=2017,],
+ggplot(data = pd,
        aes(bymonth, count)) +
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "bar")+
@@ -85,15 +78,14 @@ ggplot(data = pd[pd$year!=2017,],
                geom = "bar",color=2)
 
 # Scatterplot by month
-ggplot(data = pd[pd$year!=2017,],
+ggplot(data = pd,
        aes(bymonth, body_camera)) +
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "point")
 
 
-
 ######################################
-# Split up by age group
+# Other ggplot graphs
 ######################################
 
 pd$ageGroup <- NA
@@ -120,12 +112,53 @@ ggplot(data = pd[pd$year!=2017,],
        aes(race, count)) +
      stat_summary(fun.y = sum, # adds up all observations for the month
                   geom = "bar")+
-     stat_summary(aes(race,threat_level2),fun.y = sum,
+     stat_summary(aes(race,threat_level),fun.y = sum,
                   geom = "bar",color=2)
+
 #code to look at race + threat level
 qplot(x = pd$race, data = pd, fill = factor(pd$threat_level), geom= "bar")
 
 #code to look at race+age group
 pd[pd$race==""] <- NA
-> pd <- na.omit(pd)
-> qplot(x = pd$ageGroup, data = pd, fill=pd$race, geom = "bar")
+pd <- na.omit(pd)
+qplot(x = pd$ageGroup, data = pd, fill=pd$race, geom = "bar")
+
+
+##########################################
+# Number of police shootings by state
+##########################################
+table(pd$state)
+
+statedf<-data.frame(table(pd$state))
+statedf[,1]<-state.name[match(statedf[,1],state.abb)]
+statedf<-statedf[order(statedf$Var1),]
+statedf[,2]<-as.double(statedf[,2])
+statedf<-statedf[1:50,]
+rownames(statedf)=state.name
+us <- map_data("state")
+
+# The following code is adapted from Stack Overflow user "hrbrmstr" at the following address:
+# http://stackoverflow.com/questions/29614972/ggplot-us-state-map-colors-are-fine-polygons-jagged-r
+
+arr <- statedf %>% 
+  add_rownames("region") %>% 
+  mutate(region=tolower(region))
+
+gg <- ggplot()
+gg <- gg + geom_map(data=us, map=us,
+                    aes(x=long, y=lat, map_id=region),
+                    fill="#ffffff", color="#ffffff", size=0.15)
+gg <- gg + geom_map(data=arr, map=us,
+                    aes(fill=Freq, map_id=region),
+                    color="#ffffff", size=0.15)
+gg <- gg + scale_fill_continuous(low='thistle2', high='darkred', 
+                                 guide='colorbar')
+gg <- gg + labs(x=NULL, y=NULL)
+gg <- gg + coord_map("albers", lat0 = 39, lat1 = 45) 
+gg <- gg + theme(panel.border = element_blank())
+gg <- gg + theme(panel.background = element_blank())
+gg <- gg + theme(axis.ticks = element_blank())
+gg <- gg + theme(axis.text = element_blank())
+gg
+
+
