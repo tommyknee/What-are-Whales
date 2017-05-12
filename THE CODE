@@ -120,3 +120,10 @@ ggplot(data = pd[pd$year!=2017,],
                   geom = "bar")+
      stat_summary(aes(race,threat_level2),fun.y = sum,
                   geom = "bar",color=2)
+#code to look at race + threat level
+qplot(x = pd$race, data = pd, fill = factor(pd$threat_level), geom= "bar")
+
+#code to look at race+age group
+pd[pd$race==""] <- NA
+> pd <- na.omit(pd)
+> qplot(x = pd$ageGroup, data = pd, fill=pd$race, geom = "bar")
