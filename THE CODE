@@ -3,6 +3,7 @@ library(RCurl)
 library(dplyr)
 library(mapproj)
 library(ggplot2)
+library(fiftystater)
 
 rawWeb <- getURL("https://raw.githubusercontent.com/washingtonpost/data-police-shootings/master/fatal-police-shootings-data.csv")
 csv <- read.csv(text = rawWeb)
@@ -124,41 +125,33 @@ pd <- na.omit(pd)
 qplot(x = pd$ageGroup, data = pd, fill=pd$race, geom = "bar")
 
 
+
 ##########################################
 # Number of police shootings by state
 ##########################################
-table(pd$state)
 
-statedf<-data.frame(table(pd$state))
-statedf[,1]<-state.name[match(statedf[,1],state.abb)]
-statedf<-statedf[order(statedf$Var1),]
-statedf[,2]<-as.double(statedf[,2])
-statedf<-statedf[1:50,]
-rownames(statedf)=state.name
-us <- map_data("state")
+library(ggplot2)
 
-# The following code is adapted from Stack Overflow user "hrbrmstr" at the following address:
-# http://stackoverflow.com/questions/29614972/ggplot-us-state-map-colors-are-fine-polygons-jagged-r
 
-arr <- statedf %>% 
-  add_rownames("region") %>% 
-  mutate(region=tolower(region))
+data("fifty_states") # this line is optional due to lazy data loading
 
-gg <- ggplot()
-gg <- gg + geom_map(data=us, map=us,
-                    aes(x=long, y=lat, map_id=region),
-                    fill="#ffffff", color="#ffffff", size=0.15)
-gg <- gg + geom_map(data=arr, map=us,
-                    aes(fill=Freq, map_id=region),
-                    color="#ffffff", size=0.15)
-gg <- gg + scale_fill_continuous(low='thistle2', high='darkred', 
-                                 guide='colorbar')
-gg <- gg + labs(x=NULL, y=NULL)
-gg <- gg + coord_map("albers", lat0 = 39, lat1 = 45) 
-gg <- gg + theme(panel.border = element_blank())
-gg <- gg + theme(panel.background = element_blank())
-gg <- gg + theme(axis.ticks = element_blank())
-gg <- gg + theme(axis.text = element_blank())
-gg
+statedf<-data.frame(state=tolower(rownames(statedf)),statedf)
+
+
+statedf
+
+# map_id creates the aesthetic mapping to the state name column in your data
+p <- ggplot(statedf, aes(map_id = state)) + 
+  # map points to the fifty_states shape data
+  geom_map(aes(fill = Freq), map = fifty_states) + 
+  expand_limits(x = fifty_states$long, y = fifty_states$lat) +
+  coord_map() +
+  scale_x_continuous(breaks = NULL) + 
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "", y = "") +
+  theme(legend.position = "bottom", 
+        panel.background = element_blank())
+
+p
 
 
