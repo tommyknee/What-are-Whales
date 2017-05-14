@@ -165,7 +165,13 @@ qplot(x=pd$race, data=pd, fill=factor(pd$unarmed), geom = "bar", xlab = "Race", 
 #https://cran.r-project.org/web/packages/fiftystater/vignettes/fiftystater.html 
 #by William Murphy
 
-
+statedf<-data.frame(table(pd$state))
+statedf[,1]<-state.name[match(statedf[,1],state.abb)]
+statedf<-statedf[order(statedf$Var1),]
+statedf[,2]<-as.double(statedf[,2])
+statedf<-statedf[1:50,]
+rownames(statedf)=state.name
+us <- map_data("state")
 
 statedf<-data.frame(state=tolower(rownames(statedf)),statedf)
 
