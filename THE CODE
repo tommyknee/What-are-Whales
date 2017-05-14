@@ -34,6 +34,9 @@ levels(pd$race)
 pd$threat_level <- as.factor(pd$threat_level)
 levels(pd$threat_level)
 
+# Create a variable where 1 indicates threat level of "attack" and 0 indicates otherwise
+pd$threat_level<-ifelse(pd$threat_level=="attack",1,0)
+
 # Replace "true" (body camera present) with 1 and "false" (no body camera) with 0
 pd$body_camera <- ifelse(pd$body_camera=="True",1,0)
 
@@ -79,7 +82,7 @@ prop.table(table(pd$race,pd$attack),1)
 # In each racial group, what proportion of victims had signs of mental illness
 prop.table(table(pd$signs_of_mental_illness,pd$race),2)
 
-# Find the proportion 
+# Find the mean age of each racial group and the proportion of incidents for each racial group which involved a body camera and signs of mental illness, and the proportion of men and unarmed victims for each race 
 df <- aggregate(pd,by=list(pd$race),FUN=mean,na.rm=T)
 df<-df[,c(1,7,12,15,16,17,21)]
 df
@@ -92,8 +95,10 @@ df
 # Create variables of the month of each observation:
 pd$bymonth <- as.Date(cut(pd$date,
                          breaks = "month"))
+#Assign a value of 1 to each shooting so we can count the incidents
 pd$count <- 1
-# Bar graph by month:
+
+# Bar graph of number of incidents by month, proportion including body cameras marked
 ggplot(data = pd,
        aes(bymonth, count)) +
   stat_summary(fun.y = sum, # adds up all observations for the month
@@ -101,7 +106,7 @@ ggplot(data = pd,
   stat_summary(aes(bymonth, body_camera),fun.y = sum,
                geom = "bar",color=2)
 
-# Scatterplot by month
+# Scatterplot of number of incidents including body cameras by month
 ggplot(data = pd,
        aes(bymonth, body_camera)) +
   stat_summary(fun.y = sum, # adds up all observations for the month
@@ -112,9 +117,7 @@ ggplot(data = pd,
 # Other ggplot graphs
 ######################################
 
-table(pd$ageGroup)
-pd$threat_level<-ifelse(pd$threat_level=="attack",1,0)
-# Bar graph by month:
+# Bar graph of incidents by age group, incidents with threat level attack marked
 ggplot(data = pd[pd$year!=2017,],
        aes(ageGroup, count)) +
   stat_summary(fun.y = sum, # adds up all observations for the month
@@ -122,7 +125,7 @@ ggplot(data = pd[pd$year!=2017,],
   stat_summary(aes(ageGroup,threat_level),fun.y = sum,
                geom = "bar",color=2)
                
-# Bar graph of race and threat level:
+# Bar graph of inidents by race and threat level:
 ggplot(data = pd[pd$year!=2017,],
        aes(race, count)) +
      stat_summary(fun.y = sum, # adds up all observations for the month
