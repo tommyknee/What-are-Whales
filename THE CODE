@@ -5,6 +5,7 @@ library(mapproj)
 library(ggplot2)
 library(fiftystater)
 
+# extract data from the internet and import the csv file to R
 rawWeb <- getURL("https://raw.githubusercontent.com/washingtonpost/data-police-shootings/master/fatal-police-shootings-data.csv")
 csv <- read.csv(text = rawWeb)
 pd <- csv[1:1954,] # Removing data from 2017 because it is incomplete. We will analyze data from Jan 2015 to Dec 2016.
@@ -33,6 +34,7 @@ levels(pd$race)
 pd$threat_level <- as.factor(pd$threat_level)
 levels(pd$threat_level)
 
+# Replace "true" (body camera present) with 1 and "false" (no body camera) with 0
 pd$body_camera <- ifelse(pd$body_camera=="True",1,0)
 
 # Create year and month columns
@@ -46,17 +48,38 @@ for (i in 1:length(pd$date)){
   pd$month[i]=splitDate[2]
 }
 
+#Create a new variable of age ranges
+pd$ageGroup <- NA
+pd$ageGroup[pd$age<18] <- "<18"
+pd$ageGroup[pd$age>=18&pd$age<25] <- "18-24"
+pd$ageGroup[pd$age>=25&pd$age<35] <- "25-34"
+pd$ageGroup[pd$age>=35&pd$age<45] <- "35-44"
+pd$ageGroup[pd$age>=45&pd$age<55] <- "45-54"
+pd$ageGroup[pd$age>=55&pd$age<=65] <- "55-65"
+pd$ageGroup[pd$age>65] <- "65+"
+
 # Explore data
+
+# Find percentiles of age for each quarter of the data
 quantile(pd$age,na.rm=T)
+# How many shootings occurred in each year
 table(pd$year)
+# What proportion of the victims were of each race
 prop.table(table(pd$race))
+# In each state, what proportion of the victims were of each race
 prop.table(table(pd$state,pd$race),1)
+# In each age group, what proportion of the victims were of each race
 prop.table(table(pd$race,pd$ageGroup),2)
+# In each racial group, what proportion of victims were armed
 prop.table(table(pd$unarmed,pd$race),2)
+# In each racial group, what proportion of incidents included a body camera
 prop.table(table(pd$body_camera,pd$race),2)
+# In each racial group, what proportion of incidents had threat level "attack"
 prop.table(table(pd$race,pd$attack),1)
+# In each racial group, what proportion of victims had signs of mental illness
 prop.table(table(pd$signs_of_mental_illness,pd$race),2)
 
+# Find the proportion 
 df <- aggregate(pd,by=list(pd$race),FUN=mean,na.rm=T)
 df<-df[,c(1,7,12,15,16,17,21)]
 df
@@ -88,15 +111,6 @@ ggplot(data = pd,
 ######################################
 # Other ggplot graphs
 ######################################
-
-pd$ageGroup <- NA
-pd$ageGroup[pd$age<18] <- "<18"
-pd$ageGroup[pd$age>=18&pd$age<25] <- "18-24"
-pd$ageGroup[pd$age>=25&pd$age<35] <- "25-34"
-pd$ageGroup[pd$age>=35&pd$age<45] <- "35-44"
-pd$ageGroup[pd$age>=45&pd$age<55] <- "45-54"
-pd$ageGroup[pd$age>=55&pd$age<=65] <- "55-65"
-pd$ageGroup[pd$age>65] <- "65+"
 
 table(pd$ageGroup)
 pd$threat_level<-ifelse(pd$threat_level=="attack",1,0)
