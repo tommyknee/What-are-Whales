@@ -106,11 +106,21 @@ ggplot(data = pd,
   stat_summary(aes(bymonth, body_camera),fun.y = sum,
                geom = "bar",color=2)
 
+df<- data.frame(table(pd$bymonth))
+df[,3:4] <- table(pd$bymonth,pd$body_camera)
+df[,1]<-as.Date(df[,1])
+df[,5] <- df[4]/(df[,3]+df[,4])
+colnames(df)=c("Date","Count","No BC","BC","Prop")
+
+
+
 # Scatterplot of number of incidents including body cameras by month
-ggplot(data = pd,
-       aes(bymonth, body_camera)) +
-  stat_summary(fun.y = sum, # adds up all observations for the month
-               geom = "point")
+ggplot(df)+
+  geom_point(aes(Date,Prop))+
+  geom_smooth(aes(Date,Prop),method="lm",se=F)+
+  labs(x="Year-Month",y="Proportion of Cases with Body Cam")+
+  ggtitle("Body Camera Use over Time")+ theme(plot.title = element_text(hjust = 0.5))
+
 
 
 ######################################
