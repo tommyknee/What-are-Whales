@@ -169,6 +169,6 @@ p <- ggplot(statedf, aes(map_id = state)) +
   theme(legend.position = "bottom", 
         panel.background = element_blank())
 
-p
-
+p + ggtitle("Number of Fatal Police Shootings by State")+
+  theme(plot.title = element_text(hjust = 0.5))
 
