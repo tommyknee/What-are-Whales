@@ -147,18 +147,16 @@ qplot(x = pd$ageGroup, data = pd, fill=pd$race, geom = "bar")
 # Number of police shootings by state
 ##########################################
 
-library(ggplot2)
+# The foollowing codes in this section was adapted from 
+#https://cran.r-project.org/web/packages/fiftystater/vignettes/fiftystater.html 
+#by William Murphy
 
 
-data("fifty_states") # this line is optional due to lazy data loading
 
 statedf<-data.frame(state=tolower(rownames(statedf)),statedf)
 
-
-statedf
-
 # map_id creates the aesthetic mapping to the state name column in your data
-p <- ggplot(statedf, aes(map_id = state)) + 
+statesplot <- ggplot(statedf, aes(map_id = state)) + 
   # map points to the fifty_states shape data
   geom_map(aes(fill = Freq), map = fifty_states) + 
   expand_limits(x = fifty_states$long, y = fifty_states$lat) +
@@ -167,8 +165,10 @@ p <- ggplot(statedf, aes(map_id = state)) +
   scale_y_continuous(breaks = NULL) +
   labs(x = "", y = "") +
   theme(legend.position = "bottom", 
+        legend.title = element_text(colour="Black", size=18, face="italic"),
         panel.background = element_blank())
-
-p + ggtitle("Number of Fatal Police Shootings by State")+
+statesplot 
+statesplot + ggtitle("Number of Fatal Police Shootings by State")+
   theme(plot.title = element_text(hjust = 0.5))
+
 
