@@ -104,7 +104,7 @@ ggplot(data = pd,
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "bar")+
   stat_summary(aes(bymonth, body_camera),fun.y = sum,
-               geom = "bar",color=2)
+               geom = "bar",color=2)+ggtitle("Number of Fatal Shootings by Month and Presence of Body Camera")+xlab("Month and Year")+ylab("Number of Incidents")
 
 df<- data.frame(table(pd$bymonth))
 df[,3:4] <- table(pd$bymonth,pd$body_camera)
@@ -133,15 +133,15 @@ ggplot(data = pd[pd$year!=2017,],
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "bar")+
   stat_summary(aes(ageGroup,threat_level),fun.y = sum,
-               geom = "bar",color=2)
+               geom = "bar",color=2)+ggtitle("Number of Incidents by Age Group and Threat Level of 'Attack'")+xlab("Age Group")+ylab("Number of Incidents")
                
-# Bar graph of inidents by race and threat level:
+# Bar graph of incidents by race, incidents with threat level attack marked:
 ggplot(data = pd[pd$year!=2017,],
        aes(race, count)) +
      stat_summary(fun.y = sum, # adds up all observations for the month
                   geom = "bar")+
      stat_summary(aes(race,threat_level),fun.y = sum,
-                  geom = "bar",color=2)
+                  geom = "bar",color=2)+ggtitle("Number of Incidents by Race and Threat Level of 'Attack'")+xlab("Race")+ylab("Number of Incidents")
 
 #code to look at race + threat level
 qplot(x = pd$race, data = pd, fill = factor(pd$threat_level), geom= "bar")
