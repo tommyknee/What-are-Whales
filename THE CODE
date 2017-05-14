@@ -144,13 +144,17 @@ ggplot(data = pd[pd$year!=2017,],
                   geom = "bar",color=2)+ggtitle("Number of Incidents by Race and Threat Level of 'Attack'")+xlab("Race")+ylab("Number of Incidents")
 
 #code to look at race + threat level
-qplot(x = pd$race, data = pd, fill = factor(pd$threat_level), geom= "bar")
+qplot(x = pd$race, data = pd, fill = factor(pd$threat_level), geom= "bar", xlab= "Race", ylab= "Number of Deaths", main="Police Caused Deaths by Race and Assessed Threat Level")+scale_fill_discrete(name="Threat Level")
 
 #code to look at race+age group
-pd[pd$race==""] <- NA
-pd <- na.omit(pd)
-qplot(x = pd$ageGroup, data = pd, fill=pd$race, geom = "bar")
+qplot(x = pd$ageGroup, data = pd, fill=pd$race, geom = "bar", xlab= "Age Group", ylab= "Number of Deaths", main="Police Caused Deaths within Different Age Groups and the Racial Breakdown of Those Age Groups") + scale_fill_discrete(name = "Race")
 
+#code to look at age group + threat level
+qplot(x=pd$ageGroup, data =pd, fill=factor(pd$threat_level), geom="bar", xlab="Age Group", ylab="Number of Deaths", main = "Police Caused Deaths within Different Age Groups and the Assessed Threat Level")+scale_fill_discrete(name="Threat Level")
+
+#code to look at weapon status + race
+pd$unarmed <- ifelse(pd$armed=="unarmed",0,1)
+qplot(x=pd$race, data=pd, fill=factor(pd$unarmed), geom = "bar", xlab = "Race", ylab= "Number of Deaths", main= "Police Caused Deaths of Unarmed or Armed Persons by Race")+scale_fill_discrete(name="Weapon Status")
 
 
 ##########################################
