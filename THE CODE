@@ -78,7 +78,7 @@ prop.table(table(pd$unarmed,pd$race),2)
 # In each racial group, what proportion of incidents included a body camera
 prop.table(table(pd$body_camera,pd$race),2)
 # In each racial group, what proportion of incidents had threat level "attack"
-prop.table(table(pd$race,pd$attack),1)
+prop.table(table(pd$race,pd$threat_level),1)
 # In each racial group, what proportion of victims had signs of mental illness
 prop.table(table(pd$signs_of_mental_illness,pd$race),2)
 
