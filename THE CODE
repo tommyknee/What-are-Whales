@@ -168,5 +168,5 @@ statesplot <- ggplot(statedf, aes(map_id = state)) +
         legend.title = element_text(colour="Black", size=18, face="italic"),
         panel.background = element_blank())
 statesplot 
-statesplot + ggtitle("Number of Fatal Police Shootings by State")+
+statesplot + ggtitle("Number of Fatal Police Shootings by State \nfrom Jan 2015 to Dec 2016")+
   theme(plot.title = element_text(hjust = 0.5)) + fifty_states_inset_boxes() 
